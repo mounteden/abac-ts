@@ -1,0 +1,124 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # push commits/tags, create GitHub release
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history required for changelog generation
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine version bump from commits
+        id: version
+        run: |
+          # Get the latest tag, or use initial commit if no tags exist
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LATEST_TAG" ]; then
+            COMMITS=$(git log --format="%s" --no-merges)
+          else
+            COMMITS=$(git log "${LATEST_TAG}..HEAD" --format="%s" --no-merges)
+          fi
+
+          # Filter out release commits
+          COMMITS=$(echo "$COMMITS" | grep -v "^chore(release):" || true)
+
+          if [ -z "$COMMITS" ]; then
+            echo "No releasable commits since last release — skipping."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Determine bump type from conventional commit prefixes
+          BUMP="patch"
+          if echo "$COMMITS" | grep -qE "^[a-z]+(\(.+\))?!:|BREAKING CHANGE"; then
+            BUMP="major"
+          elif echo "$COMMITS" | grep -qE "^feat(\(.+\))?:"; then
+            BUMP="minor"
+          fi
+
+          echo "skip=false" >> $GITHUB_OUTPUT
+          echo "bump=$BUMP" >> $GITHUB_OUTPUT
+          echo "### Version bump: **$BUMP**" >> $GITHUB_STEP_SUMMARY
+
+      - uses: pnpm/action-setup@v4
+        if: steps.version.outputs.skip == 'false'
+
+      - uses: actions/setup-node@v4
+        if: steps.version.outputs.skip == 'false'
+        with:
+          node-version: lts/*
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        if: steps.version.outputs.skip == 'false'
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure git
+        if: steps.version.outputs.skip == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version
+        if: steps.version.outputs.skip == 'false'
+        id: bump
+        run: |
+          npm version ${{ steps.version.outputs.bump }} --no-git-tag-version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "### → **v$NEW_VERSION**" >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate release notes
+        if: steps.version.outputs.skip == 'false'
+        uses: orhun/git-cliff-action@v4
+        id: git-cliff
+        with:
+          config: cliff.toml
+          args: --unreleased --tag v${{ steps.bump.outputs.new_version }} --strip all
+
+      - name: Update CHANGELOG.md
+        if: steps.version.outputs.skip == 'false'
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --tag v${{ steps.bump.outputs.new_version }}
+        env:
+          OUTPUT: CHANGELOG.md
+
+      - name: Commit, tag, and push
+        if: steps.version.outputs.skip == 'false'
+        run: |
+          git add package.json CHANGELOG.md
+          git commit -m "chore(release): v${{ steps.bump.outputs.new_version }}"
+          git tag "v${{ steps.bump.outputs.new_version }}"
+          git push origin HEAD --follow-tags
+
+      - name: Publish to npm
+        if: steps.version.outputs.skip == 'false'
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub release
+        if: steps.version.outputs.skip == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump.outputs.new_version }}
+          name: v${{ steps.bump.outputs.new_version }}
+          body: ${{ steps.git-cliff.outputs.changelog }}

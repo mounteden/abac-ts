@@ -1,0 +1,53 @@
+{
+  "name": "abac-ts",
+  "version": "0.0.1",
+  "description": "A library for implementing an attribute-based access control scheme.",
+  "keywords": [
+    "abac",
+    "authorization",
+    "access-control"
+  ],
+  "homepage": "https://github.com/mounteden/abac-ts#readme",
+  "bugs": {
+    "url": "https://github.com/mounteden/abac-ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mounteden/abac-ts.git"
+  },
+  "license": "MIT",
+  "author": "Sebastian Walther",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "packageManager": "pnpm@10.30.3",
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "check": "biome check .",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "prepublishOnly": "pnpm typecheck && pnpm check && pnpm build",
+    "test": "node --experimental-transform-types --test 'tests/**/*.test.ts'",
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.4",
+    "@commitlint/cli": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.2",
+    "@types/node": "^24.0.0",
+    "husky": "^9.1.7",
+    "typescript": "^5.9.3"
+  }
+}
