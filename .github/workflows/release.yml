@@ -18,7 +18,7 @@ jobs:
       id-token: write   # npm provenance attestation
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # full history required for changelog generation
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +59,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         if: steps.version.outputs.skip == 'false'
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         if: steps.version.outputs.skip == 'false'
         with:
           node-version: lts/*
