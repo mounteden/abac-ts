@@ -7,7 +7,7 @@
     "authorization",
     "access-control"
   ],
-  "homepage": "https://github.com/mounteden/abac-ts#readme",
+  "homepage": "https://mounteden.github.io/abac-ts",
   "bugs": {
     "url": "https://github.com/mounteden/abac-ts/issues"
   },

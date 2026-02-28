@@ -30,16 +30,26 @@ jobs:
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
           if [ -z "$LATEST_TAG" ]; then
-            COMMITS=$(git log --format="%s" --no-merges)
+            RANGE="HEAD"
           else
-            COMMITS=$(git log "${LATEST_TAG}..HEAD" --format="%s" --no-merges)
+            RANGE="${LATEST_TAG}..HEAD"
           fi
 
-          # Filter out release commits
-          COMMITS=$(echo "$COMMITS" | grep -v "^chore(release):" || true)
+          COMMITS=$(git log "$RANGE" --format="%s" --no-merges | grep -v "^chore(release):" || true)
 
           if [ -z "$COMMITS" ]; then
             echo "No releasable commits since last release — skipping."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check if any commit touched package-relevant files (not just docs/metadata)
+          DOCS_ONLY_PATTERN="^(docs/|README\.md|CONTRIBUTING\.md|CODE_OF_CONDUCT\.md|SECURITY\.md|LICENSE|\.github/ISSUE_TEMPLATE|\.github/pull_request_template|\.github/CODEOWNERS|\.github/workflows/pages\.yml)"
+          CHANGED_FILES=$(git diff --name-only "$RANGE" -- 2>/dev/null || git diff --name-only HEAD -- 2>/dev/null)
+          RELEVANT_FILES=$(echo "$CHANGED_FILES" | grep -vE "$DOCS_ONLY_PATTERN" || true)
+
+          if [ -z "$RELEVANT_FILES" ]; then
+            echo "Only documentation changes since last release — skipping."
             echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
           fi

@@ -1,0 +1,9 @@
+title: abac-ts
+description: Attribute-based access control for TypeScript. Zero dependencies.
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+  - jekyll-remote-theme
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
