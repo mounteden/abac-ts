@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write   # push commits/tags, create GitHub release
+      id-token: write   # npm provenance attestation
 
     steps:
       - uses: actions/checkout@v4
@@ -111,7 +112,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.version.outputs.skip == 'false'
-        run: pnpm publish --access public --no-git-checks
+        run: pnpm publish --access public --no-git-checks --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
