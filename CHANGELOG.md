@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.5] - 2026-02-28
+
+### Miscellaneous
+
+- Extend .gitignore ([`d05f1da`](https://github.com/mounteden/abac-ts/commit/d05f1da28d883e02d25b8e0e28b08ce391ae2237))
+
 ## [0.0.4] - 2026-02-28
 
 ### Miscellaneous
