@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.6] - 2026-02-28
+
+### Miscellaneous
+
+- Add homepage ([`e1c480e`](https://github.com/mounteden/abac-ts/commit/e1c480ed95607886cbaecfa413437b3a93a6efd1))
+
 ## [0.0.5] - 2026-02-28
 
 ### Miscellaneous
