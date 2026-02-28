@@ -7,8 +7,9 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     groups:
-      dev-dependencies:
-        dependency-type: development
+      all-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: /
@@ -16,3 +17,7 @@ updates:
       interval: weekly
     commit-message:
       prefix: "chore(ci)"
+    groups:
+      all-actions:
+        patterns:
+          - "*"
