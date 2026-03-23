@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7] - 2026-03-23
+
+### Miscellaneous
+
+- **ci**: Bump the all-actions group across 1 directory with 2 updates ([`0b31a9b`](https://github.com/mounteden/abac-ts/commit/0b31a9ba569c047f5e5e6ee684fa6d7aabe0f82c))
+- **deps**: Bump the all-dependencies group with 4 updates ([`8401f6f`](https://github.com/mounteden/abac-ts/commit/8401f6f58b22925130728d38175caf1f0c0aba68))
+
 ## [0.0.6] - 2026-02-28
 
 ### Miscellaneous
