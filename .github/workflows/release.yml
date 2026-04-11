@@ -66,7 +66,7 @@ jobs:
           echo "bump=$BUMP" >> $GITHUB_OUTPUT
           echo "### Version bump: **$BUMP**" >> $GITHUB_STEP_SUMMARY
 
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
         if: steps.version.outputs.skip == 'false'
 
       - uses: actions/setup-node@v6
