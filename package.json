@@ -44,10 +44,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",
-    "@commitlint/cli": "^20.4.2",
-    "@commitlint/config-conventional": "^20.4.2",
-    "@types/node": "^25.3.3",
+    "@commitlint/cli": "^21.2.0",
+    "@commitlint/config-conventional": "^21.2.0",
+    "@types/node": "^26.1.0",
     "husky": "^9.1.7",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }
